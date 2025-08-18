@@ -1,0 +1,86 @@
+{
+    "name" : "备忘录助手",
+    "appid" : "__UNI__MEMO_APP",
+    "description" : "一款简洁易用的备忘录应用，帮助您记录生活中的重要事项",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "app-plus" : {
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        "modules" : {},
+        "distribute" : {
+            "android" : {
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ]
+            },
+            "ios" : {
+                    "privacyDescription" : {
+                        "NSUserTrackingUsageDescription" : "此标识符将用于向您投放个性化广告",
+                        "NSLocationWhenInUseUsageDescription" : "此应用在使用期间需要访问位置信息",
+                        "NSPhotoLibraryUsageDescription" : "此应用需要访问相册以选择图片",
+                        "NSCameraUsageDescription" : "此应用需要访问相机以拍摄照片"
+                    },
+                    "capabilities" : {
+                        "entitlements" : {
+                            "com.apple.developer.networking.wifi-info" : true
+                        }
+                    },
+                    "icons" : {
+                        "iphone" : {
+                            "app@2x" : "static/app-icon-1024.svg",
+                            "app@3x" : "static/app-icon-1024.svg"
+                        },
+                        "ipad" : {
+                            "app" : "static/app-icon-1024.svg",
+                            "app@2x" : "static/app-icon-1024.svg"
+                        }
+                    }
+                },
+            "sdkConfigs" : {}
+        }
+    },
+    "quickapp" : {},
+    "mp-weixin" : {
+        "appid" : "",
+        "setting" : {
+            "urlCheck" : false
+        },
+        "usingComponents" : true
+    },
+    "mp-alipay" : {
+        "usingComponents" : true
+    },
+    "mp-baidu" : {
+        "usingComponents" : true
+    },
+    "mp-toutiao" : {
+        "usingComponents" : true
+    },
+    "uniStatistics": {  
+        "enable": false
+    },
+    "vueVersion" : "3"
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端登录页面原型设计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .login-container {
+            padding: 60px 40px 40px;
+            height: calc(100% - 44px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo::before {
+            content: '🔐';
+            font-size: 40px;
+        }
+
+        .welcome-text {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 56px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 0 20px;
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 56px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 8px 25px rgba(238, 90, 36, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(238, 90, 36, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .forgot-password {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: white;
+        }
+
+        .design-notes {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-height: 812px;
+            overflow-y: auto;
+        }
+
+        .design-notes h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .design-notes h3 {
+            color: #555;
+            font-size: 18px;
+            margin: 20px 0 10px;
+        }
+
+        .design-notes p, .design-notes li {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .design-notes ul {
+            padding-left: 20px;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #eee;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .design-notes {
+                max-height: none;
+                width: 100%;
+                max-width: 375px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback" id="feedback">登录成功！</div>
+    
+    <div class="container">
+        <!-- 手机原型 -->
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>●●●●●</span>
+                    <span>100%</span>
+                </div>
+                
+                <div class="login-container">
+                    <div class="logo"></div>
+                    
+                    <div class="welcome-text">
+                        <h1>欢迎回来</h1>
+                        <p>请登录您的账户</p>
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <input type="text" class="input-field" placeholder="请输入账号" id="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" class="input-field" placeholder="请输入密码" id="password" required>
+                        </div>
+                        
+                        <button type="submit" class="login-btn">登录</button>
+                    </form>
+                    
+                    <a href="#" class="forgot-password">忘记密码？</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 设计说明 -->
+        <div class="design-notes">
+            <h2>🎨 移动端登录页面设计说明</h2>
+            
+            <h3>📱 设计理念</h3>
+            <p>采用现代化的玻璃拟态设计风格，营造轻盈、透明的视觉效果。整体设计简洁优雅，符合移动端用户的使用习惯。</p>
+            
+            <h3>🎨 视觉设计</h3>
+            <ul>
+                <li><strong>配色方案：</strong>渐变背景 + 半透明元素</li>
+                <li><strong>主色调：</strong>紫蓝渐变 (#667eea → #764ba2)</li>
+                <li><strong>强调色：</strong>橙红渐变 (#ff6b6b → #ee5a24)</li>
+                <li><strong>字体：</strong>系统默认字体，确保最佳显示效果</li>
+            </ul>
+            
+            <div class="color-palette">
+                <div class="color-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                <div class="color-item" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);"></div>
+                <div class="color-item" style="background: rgba(255,255,255,0.2);"></div>
+            </div>
+            
+            <h3>💫 交互设计</h3>
+            <ul>
+                <li><strong>输入框：</strong>聚焦时上浮效果 + 背景透明度变化</li>
+                <li><strong>按钮：</strong>悬停上浮 + 阴影加深效果</li>
+                <li><strong>反馈：</strong>登录成功后显示提示信息</li>
+                <li><strong>过渡：</strong>所有交互均有0.3s缓动动画</li>
+            </ul>
+            
+            <h3>📐 布局特点</h3>
+            <ul>
+                <li><strong>垂直居中：</strong>内容在屏幕中央，视觉平衡</li>
+                <li><strong>合理间距：</strong>元素间距遵循8px网格系统</li>
+                <li><strong>圆角设计：</strong>16px圆角营造亲和感</li>
+                <li><strong>响应式：</strong>适配不同屏幕尺寸</li>
+            </ul>
+            
+            <h3>🔧 技术实现</h3>
+            <ul>
+                <li><strong>CSS3：</strong>渐变、阴影、模糊效果</li>
+                <li><strong>Flexbox：</strong>灵活的布局系统</li>
+                <li><strong>JavaScript：</strong>表单验证和交互反馈</li>
+                <li><strong>响应式：</strong>媒体查询适配移动端</li>
+            </ul>
+            
+            <h3>✨ 设计亮点</h3>
+            <ul>
+                <li><strong>玻璃拟态：</strong>backdrop-filter模糊效果</li>
+                <li><strong>微交互：</strong>细腻的悬停和聚焦动画</li>
+                <li><strong>视觉层次：</strong>清晰的信息架构</li>
+                <li><strong>品牌感：</strong>统一的视觉语言</li>
+            </ul>
+            
+            <h3>📊 用户体验</h3>
+            <p>设计遵循移动端最佳实践，44px最小点击区域，清晰的视觉反馈，流畅的操作体验。表单验证即时反馈，减少用户等待时间。</p>
+        </div>
+    </div>
+    
+    <script>
+        // 表单提交处理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password) {
+                // 显示成功反馈
+                const feedback = document.getElementById('feedback');
+                feedback.style.display = 'block';
+                
+                // 按钮动画效果
+                const btn = document.querySelector('.login-btn');
+                btn.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                    feedback.style.display = 'none';
+                }, 2000);
+            }
+        });
+        
+        // 输入框动画效果
+        const inputs = document.querySelectorAll('.input-field');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // 忘记密码点击效果
+        document.querySelector('.forgot-password').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('忘记密码功能演示');
+        });
+    </script>
+</body>
+</html>

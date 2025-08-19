@@ -1,6 +1,6 @@
 {
     "name" : "备忘录助手",
-    "appid" : "__UNI__MEMO_APP",
+    "appid" : "mjapp.memo",
     "description" : "一款简洁易用的备忘录应用，帮助您记录生活中的重要事项",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -50,12 +50,12 @@
                     },
                     "icons" : {
                         "iphone" : {
-                            "app@2x" : "static/app-icon-1024.svg",
-                            "app@3x" : "static/app-icon-1024.svg"
+                            "app@2x" : "static/app-icon-120.svg",
+                            "app@3x" : "static/app-icon-120.svg"
                         },
                         "ipad" : {
-                            "app" : "static/app-icon-1024.svg",
-                            "app@2x" : "static/app-icon-1024.svg"
+                            "app" : "static/app-icon-120.svg",
+                            "app@2x" : "static/app-icon-120.svg"
                         }
                     }
                 },

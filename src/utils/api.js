@@ -104,19 +104,7 @@ const api = {
       data
     }),
     
-    // 忘记密码（发送验证码）
-    forgotPassword: (data) => request({
-      url: `${API_PREFIX}/auth/forgot-password`,
-      method: 'POST',
-      data
-    }),
-    
-    // 重置密码
-    resetPassword: (data) => request({
-      url: `${API_PREFIX}/auth/reset-password`,
-      method: 'POST',
-      data
-    })
+
   },
   
   // 备忘录管理接口
@@ -159,6 +147,31 @@ const api = {
       url: `${API_PREFIX}/memos/${id}`,
       method: 'DELETE'
     })
+  },
+
+  // 算力管理接口
+  currency: {
+    // 获取当前用户算力余额
+    getBalance: () => request({
+      url: `${API_PREFIX}/currency/balance`,
+      method: 'GET'
+    }),
+
+    // 扣减算力（用于扩展备忘录容量）
+    deduct: (data) => request({
+      url: `${API_PREFIX}/currency/deduct`,
+      method: 'POST',
+      data
+    }),
+
+    // 充值算力（内购成功后调用）
+    recharge: (data) => request({
+      url: `${API_PREFIX}/currency/recharge`,
+      method: 'POST',
+      data
+    }),
+
+
   }
 };
 

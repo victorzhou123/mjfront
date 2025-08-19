@@ -48,6 +48,8 @@
 
 <script>
 import api from '@/utils/api.js';
+import currencyManager from '@/utils/currency.js';
+import { CURRENCY_CONFIG } from '@/utils/currency.js';
 
 export default {
   data() {
@@ -133,7 +135,9 @@ export default {
         let res;
         
         if (this.mode === 'create') {
-          // 创建新备忘录
+          // 创建新备忘录前检查算力
+          await this.checkAndDeductCurrency();
+          
           res = await api.memos.create({
             title: this.editedMemo.title,
             content: this.editedMemo.content
@@ -168,12 +172,52 @@ export default {
         
       } catch (error) {
         console.error(this.mode === 'create' ? '创建备忘录失败:' : '更新备忘录失败:', error);
+        
+        // 根据错误类型显示不同提示
+        let errorMessage = this.mode === 'create' ? '创建失败' : '保存失败';
+        if (error.message && error.message.includes('算力')) {
+          errorMessage = error.message;
+        } else if (error.message && error.message.includes('超过')) {
+          errorMessage = error.message;
+        }
+        
         uni.showToast({
-          title: this.mode === 'create' ? '创建失败' : '保存失败',
-          icon: 'none'
+          title: errorMessage,
+          icon: 'none',
+          duration: 3000
         });
       } finally {
         this.loading = false;
+      }
+    },
+
+    // 检查并扣减算力（创建备忘录时调用）
+    async checkAndDeductCurrency() {
+      try {
+        // 获取当前备忘录数量
+        const memoListRes = await api.memos.getList({ page: 1, limit: 1 });
+        const currentMemoCount = memoListRes.data.total || 0;
+        
+        // 检查是否超过免费限制
+        if (currentMemoCount >= CURRENCY_CONFIG.FREE_MEMO_LIMIT) {
+          // 超过免费限制，需要消耗算力
+          const currentBalance = await currencyManager.getBalance();
+          
+          if (currentBalance < CURRENCY_CONFIG.MEMO_EXPANSION_COST) {
+            throw new Error(`算力余额不足，当前余额：${currentBalance}，需要：${CURRENCY_CONFIG.MEMO_EXPANSION_COST}`);
+          }
+          
+          // 扣减算力
+          await currencyManager.consumeBalance(
+            CURRENCY_CONFIG.MEMO_EXPANSION_COST, 
+            'memo_creation'
+          );
+          
+          console.log(`创建备忘录消耗算力：${CURRENCY_CONFIG.MEMO_EXPANSION_COST}，当前备忘录数量：${currentMemoCount}`);
+        }
+      } catch (error) {
+        console.error('检查算力失败:', error);
+        throw error;
       }
     },
     

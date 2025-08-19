@@ -45,8 +45,19 @@
                     },
                     "capabilities" : {
                         "entitlements" : {
-                            "com.apple.developer.networking.wifi-info" : true
+                            "com.apple.developer.networking.wifi-info" : true,
+                            "com.apple.developer.in-app-payments" : true
                         }
+                    },
+                    "iap" : {
+                        "productIds" : [
+                            "mjapp.currency.1",
+                            "mjapp.currency.6",
+                            "mjapp.currency.18",
+                            "mjapp.currency.30",
+                            "mjapp.currency.68",
+                            "mjapp.currency.128"
+                        ]
                     },
                     "icons" : {
                         "iphone" : {

@@ -37,39 +37,40 @@
                 ]
             },
             "ios" : {
-                    "privacyDescription" : {
-                        "NSUserTrackingUsageDescription" : "此标识符将用于向您投放个性化广告",
-                        "NSLocationWhenInUseUsageDescription" : "此应用在使用期间需要访问位置信息",
-                        "NSPhotoLibraryUsageDescription" : "此应用需要访问相册以选择图片",
-                        "NSCameraUsageDescription" : "此应用需要访问相机以拍摄照片"
-                    },
-                    "capabilities" : {
-                        "entitlements" : {
-                            "com.apple.developer.networking.wifi-info" : true,
-                            "com.apple.developer.in-app-payments" : true
-                        }
-                    },
-                    "iap" : {
-                        "productIds" : [
-                            "mjapp.currency.1",
-                            "mjapp.currency.6",
-                            "mjapp.currency.18",
-                            "mjapp.currency.30",
-                            "mjapp.currency.68",
-                            "mjapp.currency.128"
-                        ]
-                    },
-                    "icons" : {
-                        "iphone" : {
-                            "app@2x" : "static/app-icon-120.svg",
-                            "app@3x" : "static/app-icon-120.svg"
-                        },
-                        "ipad" : {
-                            "app" : "static/app-icon-120.svg",
-                            "app@2x" : "static/app-icon-120.svg"
-                        }
+                "privacyDescription" : {
+                    "NSUserTrackingUsageDescription" : "此标识符将用于向您投放个性化广告",
+                    "NSLocationWhenInUseUsageDescription" : "此应用在使用期间需要访问位置信息",
+                    "NSPhotoLibraryUsageDescription" : "此应用需要访问相册以选择图片",
+                    "NSCameraUsageDescription" : "此应用需要访问相机以拍摄照片"
+                },
+                "capabilities" : {
+                    "entitlements" : {
+                        "com.apple.developer.networking.wifi-info" : true,
+                        "com.apple.developer.in-app-payments" : true
                     }
                 },
+                "iap" : {
+                    "productIds" : [
+                        "mjapp.currency.1",
+                        "mjapp.currency.6",
+                        "mjapp.currency.18",
+                        "mjapp.currency.30",
+                        "mjapp.currency.68",
+                        "mjapp.currency.128"
+                    ]
+                },
+                "icons" : {
+                    "iphone" : {
+                        "app@2x" : "static/app-icon-120.svg",
+                        "app@3x" : "static/app-icon-120.svg"
+                    },
+                    "ipad" : {
+                        "app" : "static/app-icon-120.svg",
+                        "app@2x" : "static/app-icon-120.svg"
+                    }
+                },
+                "dSYMs" : false
+            },
             "sdkConfigs" : {}
         }
     },
@@ -90,8 +91,8 @@
     "mp-toutiao" : {
         "usingComponents" : true
     },
-    "uniStatistics": {  
-        "enable": false
+    "uniStatistics" : {
+        "enable" : false
     },
     "vueVersion" : "3"
 }

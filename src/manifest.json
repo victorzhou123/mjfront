@@ -43,11 +43,7 @@
                     "NSPhotoLibraryUsageDescription" : "此应用需要访问相册以选择图片",
                     "NSCameraUsageDescription" : "此应用需要访问相机以拍摄照片"
                 },
-                "capabilities" : {
-                    "entitlements" : {
-                        "com.apple.developer.in-app-payments" : true
-                    }
-                },
+
                 "iap" : {
                     "productIds" : [
                         "mjapp.currency.1",

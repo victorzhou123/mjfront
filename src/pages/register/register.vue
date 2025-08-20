@@ -176,6 +176,19 @@ export default {
         
       } catch (error) {
         console.error('注册失败:', error)
+        // 显示具体的注册失败信息
+        let errorMessage = '注册失败，请稍后重试'
+        if (error && error.message) {
+          errorMessage = error.message
+        } else if (error && error.data && error.data.message) {
+          errorMessage = error.data.message
+        }
+        
+        uni.showToast({
+          title: errorMessage,
+          icon: 'none',
+          duration: 3000
+        })
       } finally {
         this.loading = false
       }

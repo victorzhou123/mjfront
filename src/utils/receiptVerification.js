@@ -10,9 +10,9 @@ const RECEIPT_VERIFICATION_CONFIG = {
   // 沙盒环境验证URL
   SANDBOX_URL: 'https://sandbox.itunes.apple.com/verifyReceipt',
   // 应用的共享密钥（需要在App Store Connect中获取）
-  SHARED_SECRET: 'your_shared_secret_here', // TODO: 替换为实际的共享密钥
+  SHARED_SECRET: 'dbc3b43d71f7483a846aba6c10cb363c', // TODO: 替换为实际的共享密钥
   // 应用Bundle ID
-  BUNDLE_ID: 'com.yourcompany.mjapp', // TODO: 替换为实际的Bundle ID
+  BUNDLE_ID: 'mjapp.memo', // TODO: 替换为实际的Bundle ID
   // 重试次数
   MAX_RETRIES: 3,
   // 超时时间（毫秒）

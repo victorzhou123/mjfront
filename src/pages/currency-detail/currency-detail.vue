@@ -1,5 +1,44 @@
 <template>
   <view class="currency-page">
+    <!-- 调试信息区域 -->
+    <view v-if="debugInfo.show" class="debug-section">
+      <view class="debug-header" @click="toggleDebugInfo">
+        <text class="debug-title">调试信息 {{ debugInfo.expanded ? '▼' : '▶' }}</text>
+      </view>
+      <view v-if="debugInfo.expanded" class="debug-content">
+        <view class="debug-item">
+          <text class="debug-label">系统平台:</text>
+          <text class="debug-value">{{ debugInfo.platform }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="debug-label">App版本:</text>
+          <text class="debug-value">{{ debugInfo.appVersion }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="debug-label">Plus环境:</text>
+          <text class="debug-value">{{ debugInfo.plusReady ? '已就绪' : '未就绪' }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="debug-label">支付通道:</text>
+          <text class="debug-value">{{ debugInfo.paymentChannels }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="debug-label">IAP状态:</text>
+          <text class="debug-value">{{ debugInfo.iapStatus }}</text>
+        </view>
+        <view v-if="debugInfo.error" class="debug-item">
+          <text class="debug-label">错误信息:</text>
+          <text class="debug-value error">{{ debugInfo.error }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="debug-label">初始化日志:</text>
+          <view class="debug-logs">
+            <text v-for="(log, index) in debugInfo.logs" :key="index" class="debug-log">{{ log }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- 算力余额展示区 -->
     <view class="balance-section">
       <view class="balance-card">
@@ -18,7 +57,7 @@
       <view class="title-wrapper">
         <text class="section-title">充值算力</text>
         <view v-if="!iapReady" class="loading-tip">
-          <text class="loading-text">支付服务初始化中...</text>
+          <text class="loading-text">{{ debugInfo.iapStatus }}</text>
         </view>
       </view>
       <view class="purchase-grid">
@@ -50,26 +89,39 @@ export default {
       balance: 0,
       iapReady: false,
       purchaseOptions: [
-        { id: 'mjapp.currency.1', amount: 1, price: '¥1.00' },
-        { id: 'mjapp.currency.6', amount: 6, price: '¥6.00' },
-        { id: 'mjapp.currency.18', amount: 18, price: '¥18.00' },
-        { id: 'mjapp.currency.30', amount: 30, price: '¥30.00' },
-        { id: 'mjapp.currency.68', amount: 68, price: '¥68.00' },
-        { id: 'mjapp.currency.128', amount: 128, price: '¥128.00' }
-      ]
+        { id: 'mjapp1.currency.1', amount: 1, price: '¥1.00' },
+        { id: 'mjapp1.currency.6', amount: 6, price: '¥6.00' },
+        { id: 'mjapp1.currency.18', amount: 18, price: '¥18.00' },
+        { id: 'mjapp1.currency.30', amount: 30, price: '¥30.00' },
+        { id: 'mjapp1.currency.68', amount: 68, price: '¥68.00' },
+        { id: 'mjapp1.currency.128', amount: 128, price: '¥128.00' }
+      ],
+      debugInfo: {
+        show: true,
+        expanded: true,
+        platform: '',
+        appVersion: '',
+        plusReady: false,
+        paymentChannels: '检测中...',
+        iapStatus: '初始化中...',
+        error: '',
+        logs: []
+      }
     };
   },
   
   async onLoad() {
     await this.loadBalance();
-    await this.initializeIAP();
+    await this.initializeIAPWithDebug();
   },
   
   methods: {
     async loadBalance() {
       try {
         this.balance = await currencyManager.getBalance();
+        this.addDebugLog('余额加载成功: ' + this.balance);
       } catch (error) {
+        this.addDebugLog('加载余额失败: ' + error.message);
         console.error('加载余额失败:', error);
         uni.showToast({
           title: '加载余额失败',
@@ -78,99 +130,100 @@ export default {
       }
     },
     
-    async initializeIAP() {
+    async initializeIAPWithDebug() {
       try {
-        console.log('页面开始初始化IAP...');
+        this.addDebugLog('开始IAP初始化...');
         
-        // 显示加载状态
-        uni.showLoading({
-          title: '初始化支付服务...',
-          mask: true
-        });
+        // 获取系统信息
+        const systemInfo = uni.getSystemInfoSync();
+        this.debugInfo.platform = systemInfo.platform;
+        this.debugInfo.appVersion = systemInfo.appVersion || 'Unknown';
+        this.addDebugLog(`系统平台: ${systemInfo.platform}`);
+        this.addDebugLog(`App版本: ${systemInfo.appVersion}`);
         
+        // 检查Plus环境
+        this.debugInfo.plusReady = typeof plus !== 'undefined';
+        this.addDebugLog(`Plus环境: ${this.debugInfo.plusReady ? '已就绪' : '未就绪'}`);
+        
+        // 检查支付通道
+        await this.checkPaymentChannels();
+        
+        // 初始化IAP
         const success = await iapManager.init();
         
         if (success) {
           this.iapReady = true;
-          console.log('IAP初始化成功');
-          uni.showToast({
-            title: '支付服务已就绪',
-            icon: 'success',
-            duration: 1000
-          });
+          this.debugInfo.iapStatus = 'IAP初始化成功';
+          this.addDebugLog('IAP初始化成功');
         } else {
           this.iapReady = false;
           const error = iapManager.getInitError();
-          console.error('IAP初始化失败:', error);
-          
-          let errorMessage = '支付服务初始化失败';
-          if (error) {
-            if (error.message.includes('不支持')) {
-              errorMessage = '当前设备不支持应用内购买';
-            } else if (error.message.includes('超时')) {
-              errorMessage = '支付服务连接超时，请检查网络';
-            } else if (error.message.includes('未找到')) {
-              errorMessage = '支付服务配置错误，请联系开发者';
-            }
-          }
-          
-          uni.showModal({
-            title: '提示',
-            content: errorMessage + '\n\n可能的解决方案：\n1. 确保在真实iOS设备上运行\n2. 检查网络连接\n3. 重启应用重试',
-            showCancel: false
-          });
+          this.debugInfo.error = error ? error.message : '未知错误';
+          this.debugInfo.iapStatus = 'IAP初始化失败';
+          this.addDebugLog('IAP初始化失败: ' + this.debugInfo.error);
         }
       } catch (error) {
-        console.error('初始化IAP时发生异常:', error);
         this.iapReady = false;
-        uni.showToast({
-          title: '支付服务异常',
-          icon: 'none',
-          duration: 2000
-        });
-      } finally {
-        uni.hideLoading();
+        this.debugInfo.error = error.message;
+        this.debugInfo.iapStatus = 'IAP初始化异常';
+        this.addDebugLog('IAP初始化异常: ' + error.message);
+        console.error('初始化IAP时发生异常:', error);
       }
     },
     
-    // 移除原来的checkIAPStatus方法，用initializeIAP替代
-    
-    async checkIAPStatus() {
-      try {
-        // 等待IAP初始化完成，增加重试机制
-        const maxWaitTime = 15000; // 增加到15秒
-        const checkInterval = 1000; // 每秒检查一次
-        const startTime = Date.now();
-        
-        while (!iapManager.isInitialized && (Date.now() - startTime) < maxWaitTime) {
-          await new Promise(resolve => setTimeout(resolve, checkInterval));
-        }
-        
-        this.iapReady = iapManager.isInitialized;
-        
-        if (!this.iapReady) {
-          console.warn('IAP初始化超时');
-          uni.showToast({
-            title: '支付服务初始化失败，请检查网络或重启应用',
-            icon: 'none',
-            duration: 3000
+    async checkPaymentChannels() {
+      return new Promise((resolve) => {
+        // #ifdef APP-PLUS
+        if (typeof plus !== 'undefined' && plus.payment) {
+          plus.payment.getChannels((channels) => {
+            const channelIds = channels.map(c => c.id);
+            this.debugInfo.paymentChannels = channelIds.join(', ');
+            this.addDebugLog(`支付通道: ${channelIds.join(', ')}`);
+            
+            const hasAppleIAP = channels.some(c => c.id === 'appleiap');
+            this.addDebugLog(`Apple IAP通道: ${hasAppleIAP ? '存在' : '不存在'}`);
+            
+            resolve();
+          }, (error) => {
+            this.debugInfo.paymentChannels = '获取失败: ' + error.message;
+            this.addDebugLog('获取支付通道失败: ' + error.message);
+            resolve();
           });
         } else {
-          console.log('IAP初始化成功');
+          this.debugInfo.paymentChannels = 'Plus环境未就绪';
+          this.addDebugLog('Plus环境未就绪，无法获取支付通道');
+          resolve();
         }
-      } catch (error) {
-        console.error('检查IAP状态失败:', error);
-        this.iapReady = false;
+        // #endif
+        
+        // #ifndef APP-PLUS
+        this.debugInfo.paymentChannels = '非App平台';
+        this.addDebugLog('非App平台，不支持支付通道');
+        resolve();
+        // #endif
+      });
+    },
+    
+    addDebugLog(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      this.debugInfo.logs.push(`[${timestamp}] ${message}`);
+      // 限制日志数量
+      if (this.debugInfo.logs.length > 20) {
+        this.debugInfo.logs.shift();
       }
+    },
+    
+    toggleDebugInfo() {
+      this.debugInfo.expanded = !this.debugInfo.expanded;
     },
     
     async purchaseCurrency(option) {
       // 检查IAP是否已初始化
       if (!this.iapReady || !iapManager.isInitialized) {
-        uni.showToast({
-          title: '支付服务未就绪，请稍后重试',
-          icon: 'none',
-          duration: 2000
+        uni.showModal({
+          title: '支付服务未就绪',
+          content: `当前状态: ${this.debugInfo.iapStatus}\n\n错误信息: ${this.debugInfo.error || '无'}\n\n支付通道: ${this.debugInfo.paymentChannels}`,
+          showCancel: false
         });
         return;
       }
@@ -180,18 +233,22 @@ export default {
           title: '正在处理购买...'
         });
         
+        this.addDebugLog(`开始购买: ${option.id}`);
+        
         // 使用IAP管理器进行购买
         const result = await iapManager.purchaseProduct(option.id);
         
         if (result.success) {
           // 购买成功，刷新余额
           await this.loadBalance();
+          this.addDebugLog(`购买成功: ${option.amount}算力`);
           uni.showToast({
             title: `成功购买 ${option.amount} 算力！`,
             icon: 'success',
             duration: 2000
           });
         } else {
+          this.addDebugLog(`购买失败: ${result.error || '未知错误'}`);
           uni.showToast({
             title: result.error || '购买失败',
             icon: 'none',
@@ -199,6 +256,7 @@ export default {
           });
         }
       } catch (error) {
+        this.addDebugLog(`购买异常: ${error.message}`);
         console.error('购买失败:', error);
         let errorMessage = '购买失败，请重试';
         
@@ -225,6 +283,76 @@ export default {
 </script>
 
 <style scoped>
+/* 调试信息样式 */
+.debug-section {
+  margin: 20rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #dee2e6;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.debug-header {
+  background: #e9ecef;
+  padding: 24rpx;
+  border-bottom: 2rpx solid #dee2e6;
+}
+
+.debug-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #495057;
+}
+
+.debug-content {
+  padding: 24rpx;
+}
+
+.debug-item {
+  display: flex;
+  margin-bottom: 16rpx;
+  align-items: flex-start;
+}
+
+.debug-label {
+  font-size: 24rpx;
+  color: #6c757d;
+  min-width: 160rpx;
+  font-weight: 500;
+}
+
+.debug-value {
+  font-size: 24rpx;
+  color: #212529;
+  flex: 1;
+  word-break: break-all;
+}
+
+.debug-value.error {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.debug-logs {
+  flex: 1;
+  max-height: 400rpx;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 2rpx solid #e9ecef;
+  border-radius: 8rpx;
+  padding: 16rpx;
+}
+
+.debug-log {
+  display: block;
+  font-size: 22rpx;
+  color: #495057;
+  margin-bottom: 8rpx;
+  line-height: 1.4;
+  font-family: monospace;
+}
+
+/* 原有样式保持不变 */
 page {
   height: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

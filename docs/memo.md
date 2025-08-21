@@ -14,12 +14,12 @@
 ### ⚠️ 需要手动操作的部分 1. App Store Connect配置（必须手动完成）
 - 创建应用 ：在App Store Connect中创建应用记录
 - 配置内购商品 ：添加6个消耗型商品ID
-  - mjapp.currency.1 (¥1.00)
-  - mjapp.currency.6 (¥6.00)
-  - mjapp.currency.18 (¥18.00)
-  - mjapp.currency.30 (¥30.00)
-  - mjapp.currency.68 (¥68.00)
-  - mjapp.currency.128 (¥128.00)
+  - mjapp1.currency.1 (¥1.00)
+  - mjapp1.currency.6 (¥6.00)
+  - mjapp1.currency.18 (¥18.00)
+  - mjapp1.currency.30 (¥30.00)
+  - mjapp1.currency.68 (¥68.00)
+  - mjapp1.currency.128 (¥128.00)
 - 获取共享密钥 ：用于收据验证 2. 代码配置更新（需要手动修改）
 在 `receiptVerification.js` 中：
 

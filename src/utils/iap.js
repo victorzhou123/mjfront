@@ -7,43 +7,43 @@ import currencyManager from './currency.js';
 
 // 应用内购买商品配置
 export const IAP_PRODUCTS = {
-  'mjapp.currency.1': {
-    productId: 'mjapp.currency.1',
+  'mjapp1.currency.1': {
+    productId: 'mjapp1.currency.1',
     currency: 1,
     price: '¥1.00',
     title: '1算力',
     description: '购买1个算力，用于扩展备忘录容量'
   },
-  'mjapp.currency.6': {
-    productId: 'mjapp.currency.6',
+  'mjapp1.currency.6': {
+    productId: 'mjapp1.currency.6',
     currency: 6,
     price: '¥6.00',
     title: '6算力',
     description: '购买6个算力，用于扩展备忘录容量'
   },
-  'mjapp.currency.18': {
-    productId: 'mjapp.currency.18',
+  'mjapp1.currency.18': {
+    productId: 'mjapp1.currency.18',
     currency: 18,
     price: '¥18.00',
     title: '18算力',
     description: '购买18个算力，用于扩展备忘录容量'
   },
-  'mjapp.currency.30': {
-    productId: 'mjapp.currency.30',
+  'mjapp1.currency.30': {
+    productId: 'mjapp1.currency.30',
     currency: 30,
     price: '¥30.00',
     title: '30算力',
     description: '购买30个算力，用于扩展备忘录容量'
   },
-  'mjapp.currency.68': {
-    productId: 'mjapp.currency.68',
+  'mjapp1.currency.68': {
+    productId: 'mjapp1.currency.68',
     currency: 68,
     price: '¥68.00',
     title: '68算力',
     description: '购买68个算力，用于扩展备忘录容量'
   },
-  'mjapp.currency.128': {
-    productId: 'mjapp.currency.128',
+  'mjapp1.currency.128': {
+    productId: 'mjapp1.currency.128',
     currency: 128,
     price: '¥128.00',
     title: '128算力',
@@ -527,9 +527,9 @@ export const IAPUtils = {
    */
   getRecommendedProducts() {
     return [
-      IAP_PRODUCTS['mjapp.currency.6'],
-      IAP_PRODUCTS['mjapp.currency.18'],
-      IAP_PRODUCTS['mjapp.currency.30']
+      IAP_PRODUCTS['mjapp1.currency.6'],
+      IAP_PRODUCTS['mjapp1.currency.18'],
+      IAP_PRODUCTS['mjapp1.currency.30']
     ];
   },
 

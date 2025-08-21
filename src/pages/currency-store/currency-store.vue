@@ -201,7 +201,7 @@ export default {
       
       this.products = Object.values(IAP_PRODUCTS).map(product => ({
         ...product,
-        recommended: product.productId === 'mjapp.currency.18',
+        recommended: product.productId === 'mjapp1.currency.18',
         bonus: this.getProductBonus(product)
       }));
       

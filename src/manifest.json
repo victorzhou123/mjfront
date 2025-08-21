@@ -2,8 +2,8 @@
     "name" : "备忘录助手",
     "appid" : "__UNI__09FB9AE",
     "description" : "一款简洁易用的备忘录应用，帮助您记录生活中的重要事项",
-    "versionName" : "1.1.1",
-    "versionCode" : 111,
+    "versionName" : "1.1.2",
+    "versionCode" : 112,
     "transformPx" : false,
     "app-plus" : {
         "usingComponents" : true,

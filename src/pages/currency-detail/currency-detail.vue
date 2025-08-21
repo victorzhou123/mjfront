@@ -62,7 +62,7 @@ export default {
   
   async onLoad() {
     await this.loadBalance();
-    await this.checkIAPStatus();
+    await this.initializeIAP();
   },
   
   methods: {
@@ -78,14 +78,72 @@ export default {
       }
     },
     
+    async initializeIAP() {
+      try {
+        console.log('页面开始初始化IAP...');
+        
+        // 显示加载状态
+        uni.showLoading({
+          title: '初始化支付服务...',
+          mask: true
+        });
+        
+        const success = await iapManager.init();
+        
+        if (success) {
+          this.iapReady = true;
+          console.log('IAP初始化成功');
+          uni.showToast({
+            title: '支付服务已就绪',
+            icon: 'success',
+            duration: 1000
+          });
+        } else {
+          this.iapReady = false;
+          const error = iapManager.getInitError();
+          console.error('IAP初始化失败:', error);
+          
+          let errorMessage = '支付服务初始化失败';
+          if (error) {
+            if (error.message.includes('不支持')) {
+              errorMessage = '当前设备不支持应用内购买';
+            } else if (error.message.includes('超时')) {
+              errorMessage = '支付服务连接超时，请检查网络';
+            } else if (error.message.includes('未找到')) {
+              errorMessage = '支付服务配置错误，请联系开发者';
+            }
+          }
+          
+          uni.showModal({
+            title: '提示',
+            content: errorMessage + '\n\n可能的解决方案：\n1. 确保在真实iOS设备上运行\n2. 检查网络连接\n3. 重启应用重试',
+            showCancel: false
+          });
+        }
+      } catch (error) {
+        console.error('初始化IAP时发生异常:', error);
+        this.iapReady = false;
+        uni.showToast({
+          title: '支付服务异常',
+          icon: 'none',
+          duration: 2000
+        });
+      } finally {
+        uni.hideLoading();
+      }
+    },
+    
+    // 移除原来的checkIAPStatus方法，用initializeIAP替代
+    
     async checkIAPStatus() {
       try {
-        // 等待IAP初始化完成
-        const maxWaitTime = 10000; // 最多等待10秒
+        // 等待IAP初始化完成，增加重试机制
+        const maxWaitTime = 15000; // 增加到15秒
+        const checkInterval = 1000; // 每秒检查一次
         const startTime = Date.now();
         
         while (!iapManager.isInitialized && (Date.now() - startTime) < maxWaitTime) {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, checkInterval));
         }
         
         this.iapReady = iapManager.isInitialized;
@@ -93,10 +151,12 @@ export default {
         if (!this.iapReady) {
           console.warn('IAP初始化超时');
           uni.showToast({
-            title: '支付服务初始化失败，请重启应用',
+            title: '支付服务初始化失败，请检查网络或重启应用',
             icon: 'none',
             duration: 3000
           });
+        } else {
+          console.log('IAP初始化成功');
         }
       } catch (error) {
         console.error('检查IAP状态失败:', error);

@@ -54,37 +54,68 @@ export const IAP_PRODUCTS = {
 class IAPManager {
   constructor() {
     this.isInitialized = false;
+    this.isInitializing = false;
     this.products = [];
     this.pendingTransactions = new Map();
-    this.init();
+    this.initError = null;
   }
 
   /**
    * 初始化应用内购买
    */
   async init() {
+    if (this.isInitialized) {
+      return true;
+    }
+    
+    if (this.isInitializing) {
+      // 等待正在进行的初始化完成
+      while (this.isInitializing) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      return this.isInitialized;
+    }
+    
+    this.isInitializing = true;
+    this.initError = null;
+    
     try {
+      console.log('开始IAP初始化...');
+      
+      // 检查运行环境
+      const systemInfo = uni.getSystemInfoSync();
+      console.log('系统信息:', systemInfo);
+      
       // 检查是否支持应用内购买
       if (!this.isIAPSupported()) {
-        console.warn('当前平台不支持应用内购买');
-        return false;
+        throw new Error('当前平台不支持应用内购买');
       }
 
+      // 等待plus环境准备就绪
+      await this.waitForPlusReady();
+      console.log('Plus环境已准备就绪');
+      
       // 初始化应用内购买服务
       await this.initializeIAP();
+      console.log('IAP服务初始化成功');
       
       // 获取商品信息
       await this.loadProducts();
+      console.log('商品信息加载成功');
       
       // 恢复未完成的交易
       await this.restoreTransactions();
+      console.log('交易恢复完成');
       
       this.isInitialized = true;
       console.log('应用内购买初始化成功');
       return true;
     } catch (error) {
+      this.initError = error;
       console.error('应用内购买初始化失败:', error);
       return false;
+    } finally {
+      this.isInitializing = false;
     }
   }
 
@@ -93,12 +124,56 @@ class IAPManager {
    */
   isIAPSupported() {
     // #ifdef APP-PLUS
-    return uni.getSystemInfoSync().platform === 'ios';
+    const systemInfo = uni.getSystemInfoSync();
+    console.log('检查IAP支持 - 平台:', systemInfo.platform);
+    return systemInfo.platform === 'ios';
     // #endif
     
     // #ifndef APP-PLUS
+    console.log('检查IAP支持 - 非App平台');
     return false;
     // #endif
+  }
+
+  /**
+   * 等待plus环境准备就绪
+   */
+  async waitForPlusReady() {
+    return new Promise((resolve, reject) => {
+      // #ifdef APP-PLUS
+      const timeout = setTimeout(() => {
+        reject(new Error('Plus环境准备超时'));
+      }, 10000);
+      
+      const checkPlus = () => {
+        if (typeof plus !== 'undefined' && plus.payment) {
+          clearTimeout(timeout);
+          console.log('Plus环境检查通过');
+          resolve();
+        } else {
+          console.log('等待Plus环境...');
+          setTimeout(checkPlus, 100);
+        }
+      };
+      
+      if (typeof plus !== 'undefined' && plus.payment) {
+        clearTimeout(timeout);
+        resolve();
+      } else {
+        document.addEventListener('plusready', () => {
+          clearTimeout(timeout);
+          console.log('Plus ready事件触发');
+          resolve();
+        });
+        // 同时轮询检查
+        checkPlus();
+      }
+      // #endif
+      
+      // #ifndef APP-PLUS
+      resolve();
+      // #endif
+    });
   }
 
   /**
@@ -108,15 +183,27 @@ class IAPManager {
     return new Promise((resolve, reject) => {
       // #ifdef APP-PLUS
       if (uni.getSystemInfoSync().platform === 'ios') {
+        console.log('开始获取支付通道...');
         plus.payment.getChannels((channels) => {
+          console.log('获取到支付通道:', channels);
+          
+          // 检查是否有Apple IAP通道
           const appleIAP = channels.find(channel => channel.id === 'appleiap');
           if (appleIAP) {
             this.iapChannel = appleIAP;
+            console.log('找到Apple IAP通道:', appleIAP);
             resolve();
           } else {
-            reject(new Error('未找到Apple IAP支付通道'));
+            console.error('支付通道列表:', channels.map(c => c.id));
+            
+            // 提供更详细的错误信息
+            const availableChannels = channels.map(c => c.id).join(', ');
+            const errorMsg = `未找到Apple IAP支付通道。\n\n可用通道: ${availableChannels}\n\n可能原因:\n1. 应用未使用iOS开发者证书打包\n2. 证书未包含IAP权限\n3. 运行环境不是真实iOS设备\n4. App ID未启用IAP功能`;
+            
+            reject(new Error(errorMsg));
           }
         }, (error) => {
+          console.error('获取支付通道失败:', error);
           reject(new Error('获取支付通道失败: ' + error.message));
         });
       } else {
@@ -128,6 +215,13 @@ class IAPManager {
       reject(new Error('仅支持App平台'));
       // #endif
     });
+  }
+
+  /**
+   * 获取初始化错误
+   */
+  getInitError() {
+    return this.initError;
   }
 
   /**

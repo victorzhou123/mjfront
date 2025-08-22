@@ -2,8 +2,8 @@
     "name" : "备忘录助手",
     "appid" : "__UNI__09FB9AE",
     "description" : "一款简洁易用的备忘录应用，帮助您记录生活中的重要事项",
-    "versionName" : "1.1.4",
-    "versionCode" : 114,
+    "versionName" : "1.1.5",
+    "versionCode" : 115,
     "transformPx" : false,
     "app-plus" : {
         "usingComponents" : true,
@@ -40,10 +40,6 @@
             },
             "ios" : {
                 "privacyDescription" : {
-                    "NSUserTrackingUsageDescription" : "此标识符将用于向您投放个性化广告",
-                    "NSLocationWhenInUseUsageDescription" : "此应用在使用期间需要访问位置信息",
-                    "NSPhotoLibraryUsageDescription" : "此应用需要访问相册以选择图片",
-                    "NSCameraUsageDescription" : "此应用需要访问相机以拍摄照片"
                 },
                 "iap" : {
                     "productIds" : [
